@@ -11,10 +11,31 @@ public class Cinema {
         int rows = scanner.nextInt();
         System.out.println("Enter the number of seats in each row:");
         int seats = scanner.nextInt();
+        System.out.println();
 
         String[][] cinema = initCinemaRoom(rows, seats);
-        printCinemaRoom(cinema);
 
+        while (true) {
+            System.out.println("1. Show the seats");
+            System.out.println("2. Buy a ticket");
+            System.out.println("0. Exit");
+
+            int operation = scanner.nextInt();
+
+            switch(operation) {
+                case 0:
+                    return;
+                case 1:
+                    printCinemaRoom(cinema);
+                    break;
+                case 2:
+                    buyTicket(scanner, rows, seats, cinema);
+                    break;
+            }
+        }
+    }
+
+    private static void buyTicket(Scanner scanner, int rows, int seats, String[][] cinema) {
         System.out.println();
         System.out.println("Enter a row number:");
         int row = scanner.nextInt();
@@ -23,9 +44,9 @@ public class Cinema {
 
         int price = getPrice(rows, seats, row);
         System.out.println("Ticket price: $" + price);
+        System.out.println();
 
         cinema[row][seat] = "B";
-        printCinemaRoom(cinema);
     }
 
     private static int getPrice(int rows, int seats, int row) {
@@ -50,6 +71,7 @@ public class Cinema {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     private static String[][] initCinemaRoom(int rows, int seats) {
