@@ -1,6 +1,9 @@
 import java.util.Scanner;
 
 public class Cinema {
+    private static final int PRICE_FRONT = 10;
+    private static final int PRICE_BACK = 8;
+    private static final int MANY_SEATS = 60;
 
     public static void main(String[] args) {
         System.out.println("Enter the number of rows:");
@@ -9,28 +12,65 @@ public class Cinema {
         System.out.println("Enter the number of seats in each row:");
         int seats = scanner.nextInt();
 
-        int priceUp60 = 10;
-        int priceFront = priceUp60;
-        int priceBack = 8;
-        int seatsTotal = rows * seats;
-        int incomeLess60 = seatsTotal * priceUp60;
-        int rowsFront = 0;
-        int rowsBack = 0;
+        String[][] cinema = initCinemaRoom(rows, seats);
+        printCinemaRoom(cinema);
 
-        if (seatsTotal < 60) {
-            System.out.println("Total income:");
-            System.out.println("$" + incomeLess60);
+        System.out.println();
+        System.out.println("Enter a row number:");
+        int row = scanner.nextInt();
+        System.out.println("Enter a seat number in that row:");
+        int seat = scanner.nextInt();
+
+        int price = getPrice(rows, seats, row);
+        System.out.println("Ticket price: $" + price);
+
+        cinema[row][seat] = "B";
+        printCinemaRoom(cinema);
+    }
+
+    private static int getPrice(int rows, int seats, int row) {
+        int seatsTotal = rows * seats;
+        if (seatsTotal <= MANY_SEATS) {
+            return PRICE_FRONT;
         } else {
-            if (rows % 2 == 1) {
-                rowsFront = (rows-1)/2;
-                rowsBack = (rows+1)/2;
+            if (row <= rows / 2) {
+                return PRICE_FRONT;
             } else {
-                rowsFront = rows / 2;
-                rowsBack = rowsFront;
+                return PRICE_BACK;
             }
-            int incomeMore60 = (rowsFront * priceFront + rowsBack * priceBack) * seats;
-            System.out.println("Total income:");
-            System.out.println("$" + incomeMore60);
         }
+    }
+
+    private static void printCinemaRoom(String[][] cinema) {
+        System.out.println();
+        System.out.println("Cinema:");
+        for (String[] seatsStr : cinema) {
+            for (String seat : seatsStr) {
+                System.out.print(seat + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    private static String[][] initCinemaRoom(int rows, int seats) {
+        String[][] cinema = new String[rows + 1][seats + 1];
+        for (int i = 0; i <= rows; i++) {
+            for (int j = 0; j <= seats; j++) {
+                if (i == 0 && j == 0) {
+                    cinema[i][j] = " ";
+                    continue;
+                }
+                if (i == 0) {
+                    cinema[i][j] = Integer.toString(j);
+                    continue;
+                }
+                if (j == 0) {
+                    cinema[i][j] = Integer.toString(i);
+                    continue;
+                }
+                cinema[i][j] = "S";
+            }
+        }
+        return cinema;
     }
 }
