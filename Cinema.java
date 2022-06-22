@@ -4,53 +4,76 @@ public class Cinema {
     private static final int PRICE_FRONT = 10;
     private static final int PRICE_BACK = 8;
     private static final int MANY_SEATS = 60;
+    private static int currentIncome = 0;
+    private static int ticketsSold = 0;
+    private static int rows;
+    private static int seats;
+    private static int seatsTotal;
 
     public static void main(String[] args) {
         System.out.println("Enter the number of rows:");
         Scanner scanner = new Scanner(System.in);
-        int rows = scanner.nextInt();
+        rows = scanner.nextInt();
         System.out.println("Enter the number of seats in each row:");
-        int seats = scanner.nextInt();
-        System.out.println();
+        seats = scanner.nextInt();
 
+        seatsTotal = rows * seats;
         String[][] cinema = initCinemaRoom(rows, seats);
 
         while (true) {
+            System.out.println();
             System.out.println("1. Show the seats");
             System.out.println("2. Buy a ticket");
+            System.out.println("3. Statistics");
             System.out.println("0. Exit");
 
             int operation = scanner.nextInt();
 
-            switch(operation) {
+            switch (operation) {
                 case 0:
                     return;
                 case 1:
                     printCinemaRoom(cinema);
                     break;
                 case 2:
-                    buyTicket(scanner, rows, seats, cinema);
+                    tryToBuyTicket(scanner, cinema);
+                    break;
+                case 3:
+                    printStatistics();
                     break;
             }
         }
     }
 
-    private static void buyTicket(Scanner scanner, int rows, int seats, String[][] cinema) {
+    private static void tryToBuyTicket(Scanner scanner, String[][] cinema) {
         System.out.println();
         System.out.println("Enter a row number:");
         int row = scanner.nextInt();
         System.out.println("Enter a seat number in that row:");
         int seat = scanner.nextInt();
-
-        int price = getPrice(rows, seats, row);
-        System.out.println("Ticket price: $" + price);
         System.out.println();
 
-        cinema[row][seat] = "B";
+        if (row <= 0 || seat <= 0 || row > rows || seat > seats) {
+            System.out.println("Wrong input!");
+            tryToBuyTicket(scanner, cinema);
+        } else if (cinema[row][seat].equals("B")) {
+            System.out.println("That ticket has already been purchased!");
+            tryToBuyTicket(scanner, cinema);
+        } else {
+            int price = buyTicket(cinema, row, seat);
+            System.out.println("Ticket price: $" + price);
+        }
     }
 
-    private static int getPrice(int rows, int seats, int row) {
-        int seatsTotal = rows * seats;
+    private static int buyTicket(String[][] cinema, int row, int seat) {
+        cinema[row][seat] = "B";
+        int price = getPrice(row);
+        currentIncome = currentIncome + price;
+        ticketsSold++;
+        return price;
+    }
+
+    private static int getPrice(int row) {
         if (seatsTotal <= MANY_SEATS) {
             return PRICE_FRONT;
         } else {
@@ -71,7 +94,6 @@ public class Cinema {
             }
             System.out.println();
         }
-        System.out.println();
     }
 
     private static String[][] initCinemaRoom(int rows, int seats) {
@@ -94,5 +116,33 @@ public class Cinema {
             }
         }
         return cinema;
+    }
+
+    private static void printStatistics() {
+        System.out.println();
+        System.out.println("Number of purchased tickets: " + ticketsSold);
+        double percentage = (double) 100 * ticketsSold / seatsTotal;
+        System.out.printf("Percentage: %.2f%c%n", percentage, '%');
+        System.out.println("Current income: $" + currentIncome);
+        System.out.println("Total income: $" + totalIncome());
+    }
+
+    private static int totalIncome() {
+        int rowsFront;
+        int rowsBack;
+        int income;
+        if (seatsTotal < 60) {
+            income = seatsTotal * PRICE_FRONT;
+        } else {
+            if (rows % 2 == 1) {
+                rowsFront = (rows-1)/2;
+                rowsBack = (rows+1)/2;
+            } else {
+                rowsFront = rows / 2;
+                rowsBack = rowsFront;
+            }
+            income = (rowsFront * PRICE_FRONT + rowsBack * PRICE_BACK) * seats;
+        }
+        return income;
     }
 }
